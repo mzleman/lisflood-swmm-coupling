@@ -221,7 +221,8 @@ void CalcT(Pars *Parptr, Solver *Solverptr, Arrays *Arrptr)
 	double locT;
 
 	g=Solverptr->g;
-	cfl=Solverptr->cfl;
+	//cfl=Solverptr->cfl;
+	cfl = 0.5;  // 测试cfl
 	
 	// Calculate maximum water depth every timestep
 	MH=CalcMaxH(Parptr, Arrptr);
@@ -248,7 +249,7 @@ void CalcT(Pars *Parptr, Solver *Solverptr, Arrays *Arrptr)
 		}
 		*/
 		// Time step control for stability from actual equations (MSH, implemented by TJF)
-		if (MH > 1.0) cfl = 0.2;
+		//if (MH > 1.0) cfl = 0.2;
 		locT=cfl*Parptr->dx/(sqrt(g*MH));
 		Solverptr->Tstep=getmin(Solverptr->Tstep,locT);//水深越大 步长越小
 	}
