@@ -22,6 +22,7 @@
     <ClInclude Include="bmi.h" />
     <ClInclude Include="consts.h" />
     <ClInclude Include="couplefuncs.h" />
+    <ClInclude Include="datetime.h" />
     <ClInclude Include="finalize.h" />
     <ClInclude Include="global.h" />
     <ClInclude Include="initialize.h" />
@@ -31,11 +32,15 @@
     <ClInclude Include="VersionHistory.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="adpter_time.cpp" />
     <ClCompile Include="boundary.cpp" />
     <ClCompile Include="chkpnt.cpp" />
     <ClCompile Include="ch_flow.cpp" />
     <ClCompile Include="couple.cpp" />
     <ClCompile Include="couplePoint.cpp" />
+    <ClCompile Include="datetime.cpp">
+      <SDLCheck Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</SDLCheck>
+    </ClCompile>
     <ClCompile Include="finalize.cpp" />
     <ClCompile Include="fp_acc.cpp" />
     <ClCompile Include="fp_flow.cpp" />

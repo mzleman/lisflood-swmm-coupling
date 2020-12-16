@@ -12,6 +12,7 @@ states found in the manual. TJF.
 
 #include "lisflood.h"
 #include "mzmodel.h"
+#include "datetime.h"
 
 
 //-----------------------------------------------------------------------------
@@ -68,7 +69,16 @@ void ReadParamFile(const char *fname, Fnames *Fnameptr, States *Statesptr, Pars 
 		  Statesptr->start_ch_h = ON;
 	  }
 
-	  if (!strcmp(buffer, "sim_time")) fscanf(par_fp, "%lf", &Solverptr->Sim_Time);//模拟总时长
+	  // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	  // 
+	  if (!strcmp(buffer, "sim_time")) fscanf(par_fp, "%lf", &Solverptr->Sim_Time);  //模拟总时长
+	  if (!strcmp(buffer, "start_date")) fscanf(par_fp, "%s", Parptr->event_start_date); 
+	  if (!strcmp(buffer, "end_date")) fscanf(par_fp, "%s", Parptr->event_end_date); 
+	  if (!strcmp(buffer, "start_time")) fscanf(par_fp, "%s", Parptr->event_start_time);
+	  if (!strcmp(buffer, "end_time")) fscanf(par_fp, "%s", Parptr->event_end_time);
+	  //
+	  // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
 
 	  if (!strcmp(buffer, "initial_tstep")) fscanf(par_fp, "%lf", &Solverptr->InitTstep);//初始步长
 	  if (!strcmp(buffer, "massint")) fscanf(par_fp, "%lf", &Parptr->MassInt);//忘了这是啥 massint？
@@ -470,6 +480,15 @@ void ReadParamFile(const char *fname, Fnames *Fnameptr, States *Statesptr, Pars 
   {
 	  printf("\nWARNING: Latlong must be used with subgrid model. Aborting...\n\n");
 	  exit (1);
+  }
+
+  if ( !checkEventTime(Parptr->event_start_date, Parptr->event_start_time, Parptr->event_end_date, Parptr->event_end_time) ) {
+	  Solverptr->Sim_Time = getSimTime(Parptr->event_start_date, Parptr->event_start_time, Parptr->event_end_date, Parptr->event_end_time);
+	  printf("Event simulation duration: %10.1fs", Solverptr->Sim_Time);
+  }
+  else if (Solverptr->Sim_Time <= 0.0) {
+	  printf("\nError: Simulation duration is less than 0 seconds");
+	  exit(1);
   }
 
   return;

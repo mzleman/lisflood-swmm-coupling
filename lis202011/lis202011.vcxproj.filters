@@ -45,6 +45,9 @@
     <ClInclude Include="VersionHistory.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="datetime.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="couple.cpp">
@@ -111,6 +114,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="couplePoint.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="datetime.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="adpter_time.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

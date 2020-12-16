@@ -221,8 +221,8 @@ void CalcT(Pars *Parptr, Solver *Solverptr, Arrays *Arrptr)
 	double locT;
 
 	g=Solverptr->g;
-	//cfl=Solverptr->cfl;
-	cfl = 0.5;  // ≤‚ ‘cfl
+	cfl=Solverptr->cfl;
+	//cfl = 0.5;  // ≤‚ ‘cfl
 	
 	// Calculate maximum water depth every timestep
 	MH=CalcMaxH(Parptr, Arrptr);

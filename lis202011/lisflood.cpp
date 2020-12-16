@@ -11,6 +11,8 @@ Tel: +44-117-928-9108, Fax: +44-117-928-7878
 
 */
 
+#pragma warning(disable:4996)
+
 
 #include "lisflood.h"
 #include "VersionHistory.h"

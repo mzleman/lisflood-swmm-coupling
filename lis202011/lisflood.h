@@ -300,6 +300,12 @@ struct Pars{
   int allowPonding;
   int dischargeRules;
   int swmm;
+  // 模拟事件的真实开始时间
+  char event_start_date[12];
+  char event_start_time[9];
+  char event_end_date[12];
+  char event_end_time[9];
+
 } ;
 
 // Solver settings

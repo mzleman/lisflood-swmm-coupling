@@ -111,6 +111,10 @@ extern "C" int init(int argc, const char *argv[]) {
   
   Parptr->allowPonding = OFF;
   Parptr->swmm = OFF;
+  Parptr->event_end_date[0] = '\0';
+  Parptr->event_end_time[0] = '\0';
+  Parptr->event_start_date[0] = '\0';
+  Parptr->event_start_time[0] = '\0';
 
 
   // Define initial values for boundary conditions
@@ -124,7 +128,7 @@ extern "C" int init(int argc, const char *argv[]) {
   Arrptr->SGCManningsn=NULL;
 
   // Define initial values for solver settings
-  Solverptr->Sim_Time=3600.0;
+  Solverptr->Sim_Time = 0.0;
   Solverptr->InitTstep=10.0;		// Maximum timestep
   Solverptr->Nit=360;
   Solverptr->itCount=0;
