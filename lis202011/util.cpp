@@ -102,6 +102,14 @@ double minmag(double a,double b)
   if(fabs(a)<fabs(b)) res=a; else res=b;
   return res;
 }
+double maxInArray(double* arr, int len) {
+	if (len <= 0) return 0.0;
+	double maxVal = arr[0];
+	for (int i = 0; i < len; i++) {
+		if (arr[i] > maxVal) maxVal = arr[i];
+	}
+	return maxVal;
+}
 
 //---------------------------------------------------------------------------
 // CALCULATE VOLUME OF WATER IN CHANNEL AND FLOODPLAIN
@@ -223,7 +231,7 @@ void UpdateV(States *Statesptr, Pars *Parptr, Solver *Solverptr,BoundCs *BCptr,C
 	int i,j,p0,pxy0,px1,pyl;
 	double Vc,Xv,Yv,Haz;
 	
-#pragma omp parallel for private( i,p0,pxy0,px1,pyl,Xv,Yv,Vc,Haz)
+#pragma omp parallel for private( i,p0,pxy0,px1,pyl,Xv,Yv,Vc,Haz) num_threads(Solverptr->ThreadNum)
 	  // calc at Ps
 	  for(j=0;j<Parptr->ysz;j++)
 	  {

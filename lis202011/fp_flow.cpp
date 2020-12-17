@@ -47,7 +47,7 @@ void FloodplainQ(States *Statesptr,Pars *Parptr,Solver *Solverptr, Arrays *Arrpt
 //  }
 
 	// Calculate Qx
-#pragma omp parallel for private( i, h0, h1, hptr0,qptr,wiptr,TSptr,ThreadTS) 
+#pragma omp parallel for private( i, h0, h1, hptr0,qptr,wiptr,TSptr,ThreadTS) num_threads(Solverptr->ThreadNum)
   for(j=0;j<Parptr->ysz;j++)
   {
     hptr0=Arrptr->H+j*Parptr->xsz;
@@ -89,7 +89,7 @@ void FloodplainQ(States *Statesptr,Pars *Parptr,Solver *Solverptr, Arrays *Arrpt
   }
 	// Calculate Qy
 //#pragma omp section
-#pragma omp parallel for private( i, h0, h1, hptr0,hptr1,qptr,wiptr,TSptr,ThreadTS)
+#pragma omp parallel for private( i, h0, h1, hptr0,hptr1,qptr,wiptr,TSptr,ThreadTS) num_threads(Solverptr->ThreadNum)
   for(j=0;j<Parptr->ysz-1;j++)
   {
     hptr0=Arrptr->H+j*Parptr->xsz;

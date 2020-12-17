@@ -1,5 +1,6 @@
 #include "initialize.h"
 #include "finalize.h"
+#include <omp.h>
 
 using namespace std; // CCS
 
@@ -115,6 +116,8 @@ extern "C" int init(int argc, const char *argv[]) {
   Parptr->event_end_time[0] = '\0';
   Parptr->event_start_date[0] = '\0';
   Parptr->event_start_time[0] = '\0';
+  Parptr->threadCount = 0;
+  Parptr->maxThreadCount = omp_get_num_procs(); // 获取机器最大线程数
 
 
   // Define initial values for boundary conditions
@@ -239,6 +242,17 @@ extern "C" int init(int argc, const char *argv[]) {
   // Assume the last command line argument is the parameter file 认为命令行最后一个参数是par文件路径
   ReadParamFile(argv[argc-1], Fnameptr, Statesptr, Parptr, Solverptr, verbose);
   //---------------------------------------------------------------------------
+
+  // xxxxxxxxxxxxxxxxxxxxx  设置计算所用的线程数  xxxxxxxxxxxxxxxxx
+
+  Solverptr->ThreadNum = Parptr->maxThreadCount;
+  if (Parptr->threadCount > 0 && Parptr->threadCount < Solverptr->ThreadNum) {
+	  Solverptr->ThreadNum = Parptr->threadCount;
+  }
+  Arrptr->ThreadMaxHs = new double[Solverptr->ThreadNum];
+  printf("\nUsing %d threads to simulate.", Solverptr->ThreadNum);
+
+  // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
   // allow output folder to be determined by commandline
   for(i=1;i<argc-1;i++) if(!strcmp(argv[i],"-dir"))//命令行重置结果数据保存目录

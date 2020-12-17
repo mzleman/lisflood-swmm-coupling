@@ -80,7 +80,7 @@ void UpdateH(States *Statesptr, Pars *Parptr, Solver *Solverptr,BoundCs *BCptr,C
   }
 
   // Calculate dV (+ve => outflow) and update NewH
-#pragma omp parallel for private( i,qxptr0,qyptr0,qyptr1,hptr,mptr,dV,dAPorTemp)
+#pragma omp parallel for private( i,qxptr0,qyptr0,qyptr1,hptr,mptr,dV,dAPorTemp) num_threads(Solverptr->ThreadNum)
   for(j=0;j<Parptr->ysz;j++)
   {
     qxptr0=Arrptr->Qx+j*(Parptr->xsz+1);

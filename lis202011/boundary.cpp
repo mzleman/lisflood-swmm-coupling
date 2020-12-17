@@ -1303,7 +1303,7 @@ void BoundaryFlux(States *Statesptr,Pars *Parptr,Solver *Solverptr,BoundCs *BCpt
 
    // ***** Note ..... Qy is positive north to south
 
-#pragma omp parallel // private (Arrptr)
+#pragma omp parallel num_threads(Solverptr->ThreadNum)// private (Arrptr) 
   {
 	  #pragma omp sections private (i)
 	  {	 

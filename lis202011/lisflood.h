@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <omp.h>
 //#include <omp.h>
 #include <vector> // CCS
 #include <iostream> // CCS
@@ -96,6 +97,7 @@ struct Arrays{
   double *SGCQin; //JMH
   double *dx, *dy, *dA; // CCS added for lat long data
   int  *SGCgroup;
+  double* ThreadMaxHs;
 } ;
 
 //-------------------------------------------
@@ -305,6 +307,9 @@ struct Pars{
   char event_start_time[9];
   char event_end_date[12];
   char event_end_time[9];
+  // 并行策略
+  int threadCount;
+  int maxThreadCount;
 
 } ;
 
@@ -341,6 +346,7 @@ struct Solver{
   time_t time_check;
   double theta; //GAMA added for q-centred scheme
   int fricSolver2D; //GAMA: Solves the friction term using the vectorial (2D) scheme
+  int ThreadNum;
 } ;
 
 //-------------------------------------------
@@ -450,7 +456,7 @@ double CalcEnergySlope(double n,double w,double h,double Q);
 // Acceleration floodplain solver
 double CalcFPQxAcc(int i,int j, States *,Pars *, Solver *, Arrays *);
 double CalcFPQyAcc(int i,int j, States *,Pars *, Solver *, Arrays *);
-double CalcMaxH(Pars *, Arrays *);
+double CalcMaxH(Pars *, Arrays *, Solver *);
 void CalcT(Pars *, Solver *, Arrays *);
 void UpdateQs(Pars *, Arrays *);
 
@@ -501,6 +507,7 @@ double CalcWeirQy(int i,int j,Pars *, Arrays *, Solver *, States *, SGCprams *);
 double DomainVol(States *, Pars *, ChannelSegmentType *, Arrays *, vector<ChannelSegmentType> *);
 void SmoothBanks(Pars *,Solver *, ChannelSegmentType *, Arrays *, vector<ChannelSegmentType> *, int *);
 double getmax(double a,double b);
+double maxInArray(double*, int);
 double getmin(double a,double b);
 void DryCheck(Pars *, Solver *,Arrays *);
 int signR(double a);
@@ -535,7 +542,7 @@ void CalcTRoe(Pars *, Solver *, Arrays *);
 void updateTimeStep(int swmm);
 
 // 更新耦合点: 1.计算排涝量/溢流量 2.更新该处水深
-void updateCouplePoints(double tstep, double lastTstep);
+void updateCouplePoints(double tstep, double lastTstep, int threadsN);
 
 // double类型间的比较是否相等
 int isEqual(double, double, double eps = 1e-6);

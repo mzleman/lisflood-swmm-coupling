@@ -15,8 +15,9 @@ void FPInfiltration(Pars *Parptr, Solver *Solverptr, Arrays *Arrptr)
 {
   int i,j;
   double cell_inf,h0;
-
+  double loc_inf_total = 0.0;
   // Calculate Infiltration
+#pragma omp parallel for private(i, h0, cell_inf) num_threads(Solverptr->ThreadNum) reduction (+:loc_inf_total)  // Parallelised CCS Dec 2020 bt Mazheng NNU
   for(j=0;j<Parptr->ysz;j++) 
   {
     for(i=0;i<Parptr->xsz;i++) 
@@ -36,12 +37,12 @@ void FPInfiltration(Pars *Parptr, Solver *Solverptr, Arrays *Arrptr)
           }
           Arrptr->H[i+j*Parptr->xsz]=h0;
           //for mass-balance
-          Parptr->InfilTotalLoss+=cell_inf*Parptr->dA;
+		  loc_inf_total +=cell_inf*Parptr->dA;
         }
       }
     }
   }
-
+  Parptr->InfilTotalLoss += loc_inf_total;
   return;
 }
 
@@ -96,7 +97,7 @@ void Rainfall(Pars *Parptr, Solver *Solverptr, Arrays *Arrptr)
   rain_rate=InterpBC(Arrptr->rain,Solverptr->t);//constant rate across whole floodplain
 
   // Add rainfall depth to water heights
-#pragma omp parallel for private(i, p0, h0, cell_rain) reduction (+:loc_rainfall_total)  // Parallelised CCS May 2013
+#pragma omp parallel for private(i, p0, h0, cell_rain) num_threads(Solverptr->ThreadNum) reduction (+:loc_rainfall_total)  // Parallelised CCS May 2013
   for(j=0;j<Parptr->ysz;j++) 
   {
     for(i=0;i<Parptr->xsz;i++) 

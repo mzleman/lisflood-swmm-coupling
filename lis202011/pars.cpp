@@ -69,15 +69,7 @@ void ReadParamFile(const char *fname, Fnames *Fnameptr, States *Statesptr, Pars 
 		  Statesptr->start_ch_h = ON;
 	  }
 
-	  // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-	  // 
-	  if (!strcmp(buffer, "sim_time")) fscanf(par_fp, "%lf", &Solverptr->Sim_Time);  //模拟总时长
-	  if (!strcmp(buffer, "start_date")) fscanf(par_fp, "%s", Parptr->event_start_date); 
-	  if (!strcmp(buffer, "end_date")) fscanf(par_fp, "%s", Parptr->event_end_date); 
-	  if (!strcmp(buffer, "start_time")) fscanf(par_fp, "%s", Parptr->event_start_time);
-	  if (!strcmp(buffer, "end_time")) fscanf(par_fp, "%s", Parptr->event_end_time);
-	  //
-	  // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
 
 
 	  if (!strcmp(buffer, "initial_tstep")) fscanf(par_fp, "%lf", &Solverptr->InitTstep);//初始步长
@@ -442,9 +434,10 @@ void ReadParamFile(const char *fname, Fnames *Fnameptr, States *Statesptr, Pars 
 		  Statesptr->dist_routing = ON;
 		  if (*verbose == ON) printf("\nUsing slope dependent routing velocity.\n");
 	  }
+
 	  //
 	  // ============================================
-	  // 以下为马铮新增的par选项
+	  // 以下为马铮新增的 以及修改的par选项
 	  if (!strcmp(buffer, "allow_ponding")) {
 		  Parptr->allowPonding = ON;
 	  }
@@ -460,6 +453,20 @@ void ReadParamFile(const char *fname, Fnames *Fnameptr, States *Statesptr, Pars 
 		  Parptr->swmm = ON;
 		  fscanf(par_fp, "%s", Fnameptr->inpFileName);
 	  }
+	  if (!strcmp(buffer, "threads")) {
+		  fscanf(par_fp, "%d", &Parptr->threadCount);
+		  if (*verbose == ON) printf("Thread count changed to %d.", Parptr->threadCount);
+		  if (*verbose == ON) printf("The max thread count of this PC is %d.\n", Parptr->maxThreadCount);
+	  }
+	  // xxxxxxxxxxxxxxxxxxxxxxx 起止时间配置 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  
+	  // 
+	  if (!strcmp(buffer, "sim_time")) fscanf(par_fp, "%lf", &Solverptr->Sim_Time);  // 模拟总时长，在设定起止时间的情况下，此条配置会被覆盖
+	  if (!strcmp(buffer, "start_date")) fscanf(par_fp, "%s", Parptr->event_start_date);
+	  if (!strcmp(buffer, "end_date")) fscanf(par_fp, "%s", Parptr->event_end_date);
+	  if (!strcmp(buffer, "start_time")) fscanf(par_fp, "%s", Parptr->event_start_time);
+	  if (!strcmp(buffer, "end_time")) fscanf(par_fp, "%s", Parptr->event_end_time);
+	  //
+	  // xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
   }
 
 

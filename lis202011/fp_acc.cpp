@@ -8,6 +8,7 @@ Calculate flow between floodplain cells using acceleration formulation.
 *****************************************************************************
 */
 #include "lisflood.h"
+#include "global.h"
 
 //-----------------------------------------------------------------------------
 
@@ -185,32 +186,60 @@ double CalcFPQyAcc(int i,int j,States *Statesptr,Pars *Parptr,Solver *Solverptr,
 }
 ////-----------------------------------------------------------------------------------
 //// Calculate max(H) for each timestep
-double CalcMaxH(Pars *Parptr, Arrays *Arrptr)
+double CalcMaxH(Pars *Parptr, Arrays *Arrptr, Solver *Solverptr)
 {
 	int i,j,p0;
-	double h0, Hmax=0.0,ThreadMax;
-
-
-// Loop through to calculate maximum water depth
-#pragma omp parallel for private(i,p0,h0,ThreadMax)
-	for(j=0;j<Parptr->ysz;j++) {
-		ThreadMax=0.0;
-		for(i=0;i<Parptr->xsz;i++)
+	double h0, Hmax=0.0,ThreadMax = 0.0;
+	int threadNum = Solverptr->ThreadNum;
+	int workingThreads = -1, threadFlag = OFF, threadIndex = -1;
+	omp_lock_t lock;
+	omp_init_lock(&lock);
+	for (i = 0; i < threadNum; i++) {
+		Arrptr->ThreadMaxHs[i] = 0.0;
+	}
+// 马铮修改的并行查找最大水深方案
+#pragma omp parallel for private(i, p0, h0) firstprivate(ThreadMax, threadFlag, threadIndex) shared(workingThreads) num_threads(threadNum)
+	for (j = 0; j < Parptr->ysz; j++) {
+		if (!threadFlag) {
+			threadFlag = ON;
+			omp_set_lock(&lock);
+			threadIndex = ++workingThreads;
+			//cout << "线程" << threadIndex << endl;
+			omp_unset_lock(&lock);
+		}
+		for (i = 0; i < Parptr->xsz; i++)
 		{
-			p0=i+j*Parptr->xsz;
-			h0=Arrptr->H[p0];
-			if(MaskTestAcc(Arrptr->ChanMask[p0])) 
+			p0 = i + j * Parptr->xsz;
+			h0 = Arrptr->H[p0];
+			if (MaskTestAcc(Arrptr->ChanMask[p0]))
 			{
-				ThreadMax=getmax(h0,ThreadMax);
+				ThreadMax = getmax(h0, ThreadMax);
 			}
 		}
-		#pragma omp critical
-		{
-			Hmax=getmax(Hmax,ThreadMax);
-		}
+		Arrptr->ThreadMaxHs[threadIndex] = getmax(ThreadMax, Arrptr->ThreadMaxHs[threadIndex]);
 	}
-
-return(Hmax);
+	Hmax = maxInArray(Arrptr->ThreadMaxHs, threadNum);
+	return(Hmax);
+// Loop through to calculate maximum water depth
+//#pragma omp parallel for private(i,p0,h0,ThreadMax)
+//	for(j=0;j<Parptr->ysz;j++) {
+//		ThreadMax=0.0;
+//		for(i=0;i<Parptr->xsz;i++)
+//		{
+//			p0=i+j*Parptr->xsz;
+//			h0=Arrptr->H[p0];
+//			if(MaskTestAcc(Arrptr->ChanMask[p0])) 
+//			{
+//				ThreadMax=getmax(h0,ThreadMax);
+//			}
+//		}
+//		#pragma omp critical
+//		{
+//			Hmax=getmax(Hmax,ThreadMax);
+//		}
+//	}
+//
+/*return(Hmax);*/
 }
 //-----------------------------------------------------------------------------------
 // Calculate timestep for acceleration version based on 2D shallow water CFL condition
@@ -225,7 +254,7 @@ void CalcT(Pars *Parptr, Solver *Solverptr, Arrays *Arrptr)
 	//cfl = 0.5;  // 测试cfl
 	
 	// Calculate maximum water depth every timestep
-	MH=CalcMaxH(Parptr, Arrptr);
+	MH=CalcMaxH(Parptr, Arrptr, Solverptr);
 	
 	// Apply local 2D CFL condition and use global minimum timestep to ensure global stability
 	if(MH >	Solverptr->DepthThresh) //Don't apply where h=0 as h appears in equation denominator
@@ -279,7 +308,7 @@ void UpdateQs(Pars *Parptr,Arrays *Arrptr)
 	dxinv=1/Parptr->dx;
 
 // Loop over all the old qx cells to update with the new qxs (in m2/s)
-#pragma omp parallel for private(i,pqptr)
+#pragma omp parallel for private(i,pqptr) num_threads(Solverptr->ThreadNum) // 限制线程数 2020-12 马铮
 	for(j=0;j<Parptr->ysz;j++)
     {
       for(i=0;i<Parptr->xsz+1;i++)
@@ -291,7 +320,7 @@ void UpdateQs(Pars *Parptr,Arrays *Arrptr)
     }
 
 // Loop over all the old qy cells to update with the new qys (in m2/s)
-#pragma omp parallel for private(i,pqptr)
+#pragma omp parallel for private(i,pqptr) num_threads(Solverptr->ThreadNum) // 限制线程数 2020-12 马铮
 	for(j=0;j<Parptr->ysz+1;j++)
     {
       for(i=0;i<Parptr->xsz;i++)

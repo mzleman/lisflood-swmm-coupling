@@ -49,7 +49,7 @@ void iterateq_step() {
 
 	if (Statesptr->acceleration == ON || Statesptr->Roe == ON) {
 		updateTimeStep(Parptr->swmm); // 在这两种解法的情况下，在计算流量之前更新计算时间步长
-		if(Parptr->swmm) updateCouplePoints(Solverptr->Tstep, Solverptr->LastTstep);
+		if(Parptr->swmm) updateCouplePoints(Solverptr->Tstep, Solverptr->LastTstep, Solverptr->ThreadNum);
 	}
 
 	//if (Statesptr->rainfall == ON && Statesptr->routing == OFF) Rainfall(Parptr, Solverptr, Arrptr); // CCS rainfall with routing scheme disabled
@@ -59,7 +59,7 @@ void iterateq_step() {
     FloodplainQ(Statesptr,Parptr,Solverptr,Arrptr,SGCptr);//计算domain内部栅格边界的流量，通过acceleration模式修改Tstep
 
 	if ( Parptr->swmm && !(Statesptr->acceleration == ON || Statesptr->Roe == ON) ) { // 不是accelaration 和 roe 模式下，在floodplianQ执行后再更新耦合点
-		updateCouplePoints(Solverptr->Tstep, Solverptr->LastTstep); 
+		updateCouplePoints(Solverptr->Tstep, Solverptr->LastTstep, Solverptr->ThreadNum);
 	}
 
 	if(Parptr->swmm) swmmStep(Solverptr->Tstep); // swmm进行计算

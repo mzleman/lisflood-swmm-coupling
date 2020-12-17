@@ -201,9 +201,9 @@ void updateTimeStep(int swmm) {
 	}
 }
 
-void updateCouplePoints(double tstep, double lastTstep) {
+void updateCouplePoints(double tstep, double lastTstep, int threadsN) {
 	double overflow;
-	#pragma omp parallel for private(overflow)
+	#pragma omp parallel for private(overflow) num_threads(threadsN)
 	for (int i = 0; i < CouplePoint::count; i++)
 	{
 		overflow = getOverflow(QPoints[i].nIndex);
