@@ -453,10 +453,22 @@ void ReadParamFile(const char *fname, Fnames *Fnameptr, States *Statesptr, Pars 
 		  Parptr->swmm = ON;
 		  fscanf(par_fp, "%s", Fnameptr->inpFileName);
 	  }
+	  if (!strcmp(buffer, "swmm_output")){
+		  Parptr->swmm_output = ON;
+		  if (*verbose == ON) printf("Output swmm rpt and out.");
+	  }
+
+
 	  if (!strcmp(buffer, "threads")) {
 		  fscanf(par_fp, "%d", &Parptr->threadCount);
 		  if (*verbose == ON) printf("Thread count changed to %d.", Parptr->threadCount);
 		  if (*verbose == ON) printf("The max thread count of this PC is %d.\n", Parptr->maxThreadCount);
+	  }
+
+	  if (!strcmp(buffer, "dynamic_rain_file")) {
+		  fscanf(par_fp, "%s", Fnameptr->dynamicrainfilename);
+		  Statesptr->dynamic_rain = ON;
+		  if (*verbose == ON) printf("Input dynamic rain. FilePath: %s", Fnameptr->dynamicrainfilename);
 	  }
 	  // xxxxxxxxxxxxxxxxxxxxxxx ∆÷π ±º‰≈‰÷√ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  
 	  // 

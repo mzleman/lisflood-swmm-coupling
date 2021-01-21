@@ -48,6 +48,15 @@
     <ClInclude Include="datetime.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="dynamic_rain.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DLL\netcdf.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="nc_tools.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="couple.cpp">
@@ -120,6 +129,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="adpter_time.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="nc_tools.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="dynamic_rain.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

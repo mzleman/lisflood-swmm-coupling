@@ -112,12 +112,14 @@ extern "C" int init(int argc, const char *argv[]) {
   
   Parptr->allowPonding = OFF;
   Parptr->swmm = OFF;
+  Parptr->swmm_output = OFF;
   Parptr->event_end_date[0] = '\0';
   Parptr->event_end_time[0] = '\0';
   Parptr->event_start_date[0] = '\0';
   Parptr->event_start_time[0] = '\0';
   Parptr->threadCount = 0;
   Parptr->maxThreadCount = omp_get_num_procs(); // 获取机器最大线程数
+
 
 
   // Define initial values for boundary conditions
@@ -129,6 +131,8 @@ extern "C" int init(int argc, const char *argv[]) {
   // Define initial values for arrays
   Arrptr->Manningsn=NULL;
   Arrptr->SGCManningsn=NULL;
+  Arrptr->X_Coordinates = NULL;
+  Arrptr->Y_Coordinates = NULL;
 
   // Define initial values for solver settings
   Solverptr->Sim_Time = 0.0;
@@ -221,6 +225,7 @@ extern "C" int init(int argc, const char *argv[]) {
   Statesptr->latlong=OFF;
   Statesptr->dist_routing=OFF;
   Statesptr->SGCvoutput=OFF; // switch for sub-grid channel velocity output
+  Statesptr->dynamic_rain = OFF;
 
   SGCptr->NSGCprams=0;
   SGCptr->SGCbetahmin=0.2;
@@ -448,6 +453,11 @@ extern "C" int init(int argc, const char *argv[]) {
   if(Statesptr->rainfall==ON) LoadRain(Fnameptr,Arrptr,verbose);
   if(Statesptr->save_stages==ON) LoadStages(Fnameptr, Statesptr, Parptr, Stageptr, verbose);
   if(Statesptr->gsection==ON) LoadGauges(Fnameptr, Statesptr, Parptr, Stageptr, verbose);
+
+
+  if (Statesptr->dynamic_rain == ON) {
+	  initCoordinates(Parptr, Arrptr, *verbose);
+  }
 
   if (Statesptr->routing==ON) // Call FlowDirDEM to generate flow direction map from DEM before main loop CCS
   {

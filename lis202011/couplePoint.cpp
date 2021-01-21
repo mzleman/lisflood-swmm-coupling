@@ -49,7 +49,7 @@ void CouplePoint::updateStatus(double lastTstep, double overflow)
 		this->floodDepth = Arrptr->H[this->xIndex + this->yIndex * Parptr->xsz];
 
 	}
-	else   //服务于ponding overflow，不允许雨水井积水时，更新水头差
+	else   //服务于ponding overflow，允许雨水井积水时，更新水头差
 	{
 		this->overflowVol = 0.0;
 		int overFlowFlag;

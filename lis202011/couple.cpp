@@ -174,7 +174,7 @@ int initCouple() {
 		cout << "inp文件打开失败" << endl;
 		return -1;
 	}
-	if ( swmmStart(1) ) {
+	if ( swmmStart(Parptr->swmm_output) ) {
 		cout << "swmm启动失败" << endl;
 		return -1;
 	}

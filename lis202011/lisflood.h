@@ -33,6 +33,9 @@
 #include <string>
 
 
+
+
+
 //#include <netcdf.h> // JCN
 
 // define basic constants
@@ -43,6 +46,13 @@
 
 // limits
 #define MAXPI 20000
+
+#define NUMERIC_TYPE double
+#define USE_DOUBLE 1
+#define _NETCDF USE_DOUBLE
+#define _NUMERIC_MODE  USE_DOUBLE
+#define EPSILON 1e-7
+#define C(x) x
 
 // MT: disable visual C++ depreciation warnings so we can see other warnings
 #pragma warning( disable : 4996)
@@ -98,6 +108,11 @@ struct Arrays{
   double *dx, *dy, *dA; // CCS added for lat long data
   int  *SGCgroup;
   double* ThreadMaxHs;
+
+  // 记录中心点坐标
+  double* X_Coordinates;
+  double* Y_Coordinates;
+  
 } ;
 
 //-------------------------------------------
@@ -147,6 +162,7 @@ struct Fnames{
   char uniformRulesFileName[255];
   char customRulesFileName[255];  // 暂时没有实现有关该文件的功能
   char inpFileName[255];
+  char dynamicrainfilename[255];
 } ;
 
 //-------------------------------------------
@@ -258,6 +274,9 @@ struct States{
   int SGCA_mode; // JCN switches model to use parameter p as bank full Area
   int dist_routing; // JCN turnes on spatially distributed routing velocity
   int SGCvoutput; // JCN Turns on sub-grid channel velocity output
+
+  // 是否输入nc格式降雨
+  int dynamic_rain;
 } ;
 
 //-------------------------------------------
@@ -302,6 +321,7 @@ struct Pars{
   int allowPonding;
   int dischargeRules;
   int swmm;
+  int swmm_output;
   // 模拟事件的真实开始时间
   char event_start_date[12];
   char event_start_time[9];
@@ -385,6 +405,33 @@ struct QID7_Store{
   int RiverID;
 };
 //-------------------------------------------
+
+
+struct  NetCDFVariable
+{
+	int ncid;
+	size_t xlen;
+	size_t ylen;
+	size_t tlen;
+	int varid;
+	size_t time_idx;
+	NUMERIC_TYPE dt;
+	NUMERIC_TYPE* times;
+	NUMERIC_TYPE* xs;
+	NUMERIC_TYPE* ys;
+	NUMERIC_TYPE* data;
+};
+
+typedef struct Geometry
+{
+	int xsz;
+	int ysz;
+	NUMERIC_TYPE blx;
+	NUMERIC_TYPE bly;
+	NUMERIC_TYPE tly;
+	NUMERIC_TYPE dx;
+	NUMERIC_TYPE dy;
+} Geometry;
 
 
 /*
@@ -550,5 +597,8 @@ int isEqual(double, double, double eps = 1e-6);
 // 输入栅格索引，判断是否为空值栅格
 int isEmptyDEMGrid(int, int);
 int isEmptyDEMGrid(double, double);
+
+void initCoordinates(Pars *Parptr, Arrays *Arrptr, int verbose);
+
 
 #endif /* LISFLOOD_H */

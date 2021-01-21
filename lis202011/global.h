@@ -3,6 +3,7 @@
 #define GLOBAL_H
 
 #include "lisflood.h"
+#include "dynamic_rain.h"
 
 // Variables that are shared between functions and possible exposed using the library interface
 extern char t1[80];
@@ -25,6 +26,7 @@ extern vector<int> *RiversIndexVecPtr;
 extern int *RiversIndexPtr;
 extern vector<ChannelSegmentType> *ChannelSegmentsVecPtr;
 extern int *verbose;
+
 
 extern ChannelSegmentType *ChannelSegments;
 extern double Previous_t;      // previous time channel was calculated
