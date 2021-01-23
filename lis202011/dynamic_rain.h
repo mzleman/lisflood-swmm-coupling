@@ -149,17 +149,24 @@ DynamicRain<Allocator>::DynamicRain
 	geometry_.blx = netcdf_.xs[0] - geometry_.dx / C(2.0);
 	geometry_.tly = netcdf_.ys[0] + geometry_.dy / C(2.0);
 	geometry_.bly = geometry_.tly - geometry_.ysz*geometry_.dy;
-	update_time(C(0.5));
+
 	if (verbose == ON) {
 		printf("\nDynamic Rain Initialized.\n");
-		cout << geometry_.blx << endl;
-		cout << geometry_.bly << endl;
-		cout << geometry_.tly << endl;
-		//printf("data[0]: %f\n", netcdf_.data[0]);
-		//for (int i = 0; i < netcdf_.tlen; i++) {
-		//	printf("%f\n", netcdf_.times[i]);
-		//}
+		cout << "blx:\t" << geometry_.blx << endl;
+		cout << "bly:\t" << geometry_.bly << endl;
+		cout << "dx:\t" << geometry_.dx << endl;
+		cout << "dy:\t" << geometry_.dy << endl;
+		cout << "X_size:" << geometry_.xsz << endl;
+		cout << "Y_size:" << geometry_.ysz << endl;
+		cout << "time series:" << endl;
+		for (int i = 0; i < netcdf_.tlen; i++) {
+			printf("%6.2f\t", netcdf_.times[i]);
+		}
+		printf("\n");
 	}
+
+	update_time(C(0.0));
+
 }
 
 
@@ -270,7 +277,7 @@ void DynamicRain<Allocator>::update_H
 	int index;
 	update_time(Solverptr->t);
 	NUMERIC_TYPE total_rain_mass = C(0.0);
-#pragma omp parallel for reduction (+:total_rain_mass) private(x, y, index)
+#pragma omp parallel for num_threads(Solverptr->ThreadNum) reduction (+:total_rain_mass) private(x, y, index) 
 	for (int j = 0; j < Parptr->ysz; j++)
 	{
 		for (int i = 0; i < Parptr->xsz; i++)

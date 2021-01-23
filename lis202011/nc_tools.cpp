@@ -1,4 +1,5 @@
 #include "nc_tools.h"
+#include "global.h"
 
 #if _NETCDF == 1
 #include <netcdf.h>
@@ -80,6 +81,7 @@ void read_file_netCDF_start(const char *ncfilename, const char *varname,
 	if (retval = NC_GET_VARA_NUMERIC_TYPE(ncvar->ncid, yid, start, ycount,
 		ncvar->ys))
 		ERR(retval);
+
 }
 
 // assume data are ordered left-to-right, top-to-bottom
@@ -111,15 +113,18 @@ bool read_file_netCDF(NetCDFVariable *ncvar, NUMERIC_TYPE curr_time)
 		size_t count[] = { 1, ncvar->ylen, ncvar->xlen };
 		if (retval = NC_GET_VARA_NUMERIC_TYPE(ncvar->ncid, ncvar->varid, start,
 			count, ncvar->data)) ERR(retval);
-		printf("\n");
-		for (int i = 0; i < ncvar->ylen; i++) {
-			for (int j = 0; j < ncvar->xlen; j++) {
-				printf("%f\t", ncvar->data[j + i * ncvar->xlen]);
+
+		if (*verbose == ON) {
+			printf("\n");
+			cout << "Read netCDF rain file :" << endl;
+			for (int i = 0; i < ncvar->ylen; i++) {
+				for (int j = 0; j < ncvar->xlen; j++) {
+					printf("%6.2f\t", ncvar->data[j + i * ncvar->xlen]);
+				}
+				printf("\n");
 			}
 			printf("\n");
-		}
-
-			
+		}		
 	}
 
 	return old_idx != ncvar->time_idx;
